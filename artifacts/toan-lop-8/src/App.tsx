@@ -8,6 +8,7 @@ import Chapter from "@/pages/Chapter";
 import Lesson from "@/pages/Lesson";
 import Practice from "@/pages/Practice";
 import Graph from "@/pages/Graph";
+import ThucHanh from "@/pages/ThucHanh";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/bai/:lessonId" component={Lesson} />
       <Route path="/luyen-tap/:lessonId" component={Practice} />
       <Route path="/do-thi" component={Graph} />
+      <Route path="/thuc-hanh" component={ThucHanh} />
       <Route component={NotFound} />
     </Switch>
   );

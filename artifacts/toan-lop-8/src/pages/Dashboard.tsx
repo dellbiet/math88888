@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useProgress } from "@/hooks/useProgress";
-import { BookOpen, Trophy, PlayCircle, BarChart } from "lucide-react";
+import { BookOpen, Trophy, PlayCircle, BarChart2, Hash, Equal, Square, Triangle, Shuffle, Scaling, Box, TrendingUp, Divide, FlaskConical } from "lucide-react";
+
+const iconMap: Record<string, React.ComponentType<{className?: string}>> = {
+  Hash, Equal, Square, Triangle, BarChart2, Divide, TrendingUp, Shuffle, Scaling, Box, FlaskConical
+};
 
 export default function Dashboard() {
   const { progress } = useProgress();
@@ -13,10 +17,14 @@ export default function Dashboard() {
   
   const completedLessonsCount = progress.completedLessons.length;
   const totalLessons = allLessons.length;
-  const overallProgress = Math.round((completedLessonsCount / totalLessons) * 100) || 0;
+  const overallProgress = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
   
   const lastVisitedLesson = progress.lastVisited ? allLessons.find(l => l.id === progress.lastVisited) : null;
   const nextLessonToLearn = allLessons.find(l => !progress.completedLessons.includes(l.id)) || allLessons[0];
+
+  const continueUrl = lastVisitedLesson 
+    ? (lastVisitedLesson.type === 'practice' || lastVisitedLesson.type === 'chapter-test' ? `/luyen-tap/${lastVisitedLesson.id}` : `/bai/${lastVisitedLesson.id}`)
+    : (nextLessonToLearn ? (nextLessonToLearn.type === 'practice' || nextLessonToLearn.type === 'chapter-test' ? `/luyen-tap/${nextLessonToLearn.id}` : `/bai/${nextLessonToLearn.id}`) : '/');
 
   return (
     <AppLayout>
@@ -28,10 +36,10 @@ export default function Dashboard() {
             <p className="text-primary-foreground/90 text-lg mb-6 leading-relaxed">
               Học toán không khó, chỉ cần bạn kiên trì. Hãy tiếp tục hành trình chinh phục môn Toán Lớp 8 nhé.
             </p>
-            <Link href={`/bai/${lastVisitedLesson ? lastVisitedLesson.id : nextLessonToLearn.id}`}>
+            <Link href={continueUrl}>
               <Button size="lg" variant="secondary" className="font-semibold gap-2">
                 <PlayCircle className="w-5 h-5" />
-                {lastVisitedLesson ? "Tiếp tục bài đang học" : "Bắt đầu học ngay"}
+                Tiếp tục học
               </Button>
             </Link>
           </div>
@@ -41,7 +49,7 @@ export default function Dashboard() {
           <Card className="shadow-sm border-border/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Tiến độ tổng thể</CardTitle>
-              <BarChart className="w-4 h-4 text-primary" />
+              <BarChart2 className="w-4 h-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold mb-2">{overallProgress}%</div>
@@ -79,13 +87,19 @@ export default function Dashboard() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {curriculum.map(chapter => {
               const chapterCompleted = chapter.lessons.filter(l => progress.completedLessons.includes(l.id)).length;
-              const chapterProgress = Math.round((chapterCompleted / chapter.lessons.length) * 100) || 0;
+              const chapterProgress = chapter.lessons.length > 0 ? Math.round((chapterCompleted / chapter.lessons.length) * 100) : 0;
+              const IconComponent = iconMap[chapter.icon] || BookOpen;
               
               return (
                 <Link key={chapter.id} href={`/chuong/${chapter.id}`}>
                   <Card className="h-full transition-all hover:shadow-md hover:border-primary/50 cursor-pointer group">
-                    <CardHeader>
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">{chapter.title}</CardTitle>
+                    <CardHeader className="flex flex-row items-start gap-4 space-y-0">
+                      <div className={`p-2 rounded-lg bg-primary/10 ${chapter.color}`}>
+                        <IconComponent className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">{chapter.title}</CardTitle>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="flex justify-between text-sm text-muted-foreground mb-2">
